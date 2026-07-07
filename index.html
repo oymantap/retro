@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Retro RetroVibe Console - Ultra Optimize</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0f1015; /* Warna solid enteng */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* Container Utama - Flat & Ringan */
+        .console-container {
+            width: 100%;
+            max-width: 430px; 
+            height: 100vh;
+            background: #15171e;
+            border-left: 1px solid rgba(255, 255, 255, 0.03);
+            border-right: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            justify-content: space-between;
+        }
+
+        /* Bagian Layar */
+        .screen-section {
+            width: 100%;
+            flex: 1;
+            max-height: 45%;
+            background: #000;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .emulator-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        #game {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* HAPUS PAKSA UI DAN TOMBOL ABU-ABU BAWAAN EMULATOR YANG NUMPUK */
+        div[id*="virtual-gamepad"], 
+        .ejs-controls, 
+        #game img,
+        .pico8-content,
+        [class*="gamepad"],
+        #virtual-gamepad {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        /* Bagian Kontroler Custom Kita */
+        .controls-section {
+            height: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 10px 10px 10px;
+            z-index: 9999; /* Dipaksa paling atas agar responsif saat disentuh */
+        }
+
+        .main-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+        }
+
+        /* D-PAD */
+        .dpad {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+
+        .dpad-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background 0.05s ease;
+        }
+
+        .dpad-btn.active, .dpad-btn:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dpad-up { top: 0; left: 45px; width: 50px; height: 50px; border-radius: 6px 6px 0 0; border-bottom: none; }
+        .dpad-down { bottom: 0; left: 45px; width: 50px; height: 50px; border-radius: 0 0 6px 6px; border-top: none; }
+        .dpad-left { top: 45px; left: 0; width: 50px; height: 50px; border-radius: 6px 0 0 6px; border-right: none; }
+        .dpad-right { top: 45px; right: 0; width: 50px; height: 50px; border-radius: 0 6px 6px 0; border-left: none; }
+        .dpad-center { top: 45px; left: 45px; width: 50px; height: 50px; background: rgba(255, 255, 255, 0.02); pointer-events: none; }
+
+        /* Tombol A & B */
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            transform: rotate(-15deg); 
+        }
+
+        .btn-action {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.05s ease;
+        }
+
+        .btn-action span { transform: rotate(15deg); display: inline-block; }
+        .btn-action.active, .btn-action:active { transform: scale(0.92) rotate(0deg); background: rgba(255, 255, 255, 0.2); }
+        .btn-a { border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+        .btn-b { border-color: rgba(59, 130, 246, 0.3); color: #93c5fd; }
+
+        /* Menu */
+        .menu-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .btn-menu {
+            width: 70px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .btn-menu.active, .btn-menu:active { background: rgba(255, 255, 255, 0.2); }
+        .btn-menu::after {
+            content: attr(data-label);
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="console-container">
+        <div class="screen-section">
+            <div class="emulator-screen">
+                <div id="game"></div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="main-controls">
+                <div class="dpad">
+                    <div class="dpad-btn dpad-up" data-key="ArrowUp"></div>
+                    <div class="dpad-btn dpad-down" data-key="ArrowDown"></div>
+                    <div class="dpad-btn dpad-left" data-key="ArrowLeft"></div>
+                    <div class="dpad-btn dpad-right" data-key="ArrowRight"></div>
+                    <div class="dpad-center"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <div class="btn-action btn-b" data-key="b"><span>B</span></div>
+                    <div class="btn-action btn-a" data-key="a"><span>A</span></div>
+                </div>
+            </div>
+
+            <div class="menu-buttons">
+                <div class="btn-menu" data-label="Select" data-key="Select"></div>
+                <div class="btn-menu" data-label="Start" data-key="Start"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.EJS_player = '#game';
+        window.EJS_core = 'gba'; // Jalankan core GBA yang bisa ke-load di HP kamu
+        window.EJS_gameUrl = 'smb.gba'; 
+        window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+        
+        // Mematikan semua fitur kosmetik emulator bawaan agar tidak berat
+        window.EJS_VirtualGamepadSettings = { extThemes: [] };
+        window.EJS_Settings = {
+            showMenu: false,
+            startOnLoaded: true,
+            buttons: false, // Matikan tombol default abu-abu bawaan
+            disableMenu: true,
+            FastForward: true, // Izinkan optimasi frame skipping otomatis jika ngelag
+            ForceWebAudio: true, // Ringankan beban sound buffer browser
+            WebGl: true // Paksa rendering menggunakan GPU Akselerasi HP
+        };
+
+        // Kunci sinkronisasi tombol fisik custom ke core emulator internal
+        window.EJS_buttons = {
+            allow_up: 'ArrowUp',
+            allow_down: 'ArrowDown',
+            allow_left: 'ArrowLeft',
+            allow_right: 'ArrowRight',
+            allow_a: 'z', 
+            allow_b: 'x', 
+            allow_select: 'Shift',
+            allow_start: 'Enter'
+        };
+    </script>
+    <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+
+    <script>
+        const buttons = document.querySelectorAll('.dpad-btn, .btn-action, .btn-menu');
+
+        function sendCoreKey(type, keyName) {
+            let keyCodeMap = {
+                'ArrowUp': 38, 'ArrowDown': 40, 'ArrowLeft': 37, 'ArrowRight': 39,
+                'a': 90, 'b': 88, 'Select': 16, 'Start': 13
+            };
+            
+            let finalKey = keyName;
+            if(keyName === 'a') finalKey = 'z';
+            if(keyName === 'b') finalKey = 'x';
+            if(keyName === 'Select') finalKey = 'Shift';
+            if(keyName === 'Start') finalKey = 'Enter';
+
+            const eventInit = {
+                key: finalKey,
+                keyCode: keyCodeMap[keyName],
+                code: finalKey === 'Shift' ? 'ShiftLeft' : (finalKey === 'Enter' ? 'Enter' : 'Key' + finalKey.toUpperCase()),
+                bubbles: true,
+                cancelable: true,
+                view: window
+            };
+
+            // Kirim event secara agresif ke DOM utama dan sub-canvas emulator
+            document.dispatchEvent(new KeyboardEvent(type, eventInit));
+            
+            const gameContainer = document.getElementById('game');
+            if(gameContainer) {
+                gameContainer.dispatchEvent(new KeyboardEvent(type, eventInit));
+                const canvas = gameContainer.querySelector('canvas');
+                if(canvas) canvas.dispatchEvent(new KeyboardEvent(type, eventInit));
+            }
+        }
+
+        buttons.forEach(button => {
+            const startEvent = 'ontouchstart' in window ? 'touchstart' : 'mousedown';
+            const endEvent = 'ontouchstart' in window ? 'touchend' : 'mouseup';
+            const key = button.getAttribute('data-key') || button.getAttribute('data-label');
+
+            button.addEventListener(startEvent, (e) => {
+                e.preventDefault();
+                button.classList.add('active');
+                sendCoreKey('keydown', key);
+            });
+
+            button.addEventListener(endEvent, (e) => {
+                e.preventDefault();
+                button.classList.remove('active');
+                sendCoreKey('keyup', key);
+            });
+
+            button.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                const elementTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (elementTarget !== button) {
+                    button.classList.remove('active');
+                    sendCoreKey('keyup', key);
+                }
+            });
+
+            if(startEvent === 'mousedown') {
+                button.addEventListener('mouseleave', () => {
+                    button.classList.remove('active');
+                    sendCoreKey('keyup', key);
+                });
+            }
+        });
+
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+    </script>
+</body>
+</html>
