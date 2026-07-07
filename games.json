@@ -22,8 +22,6 @@
 
   { "id": "gba_dbz", "title": "Dragon Ball Z - Supersonic Warriors", "file": "games/dbz.gba", "thumb": "sampul/dbz.jpg", "type": "gba" },
 
-  { "id": "gbc_bm_max", "title": "Bomberman Max - Red Challenger", "file": "games/bm_max.gbc", "thumb": "sampul/bm_max.jpg", "type": "gb" },
-
-  { "id": "gbc_bm_quest", "title": "Bomberman Quest", "file": "games/bm_quest.gbc", "thumb": "sampul/bm_quest.jpg", "type": "gb" }
+  { "id": "gbc_bm_max", "title": "Bomberman Max - Red Challenger", "file": "games/bm_max.gbc", "thumb": "sampul/bm_max.jpg", "type": "gb" }
 
 ]
