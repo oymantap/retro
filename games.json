@@ -11,5 +11,7 @@
   { "id": "gba_hm", "title": "Harvest Moon - Friends of Mineral Town", "file": "games/harvest_moon.gba", "thumb": "sampul/harvest_moon.jpg", "type": "gba" },
   { "id": "gba_dbz", "title": "Dragon Ball Z - Supersonic Warriors", "file": "games/dbz.gba", "thumb": "sampul/dbz.jpg", "type": "gba" },
   { "id": "gbc_bm_max", "title": "Bomberman Max - Red Challenger", "file": "games/bm_max.gbc", "thumb": "sampul/bm_max.jpg", "type": "gb" },
-  { "id": "psx_trp", "title": "The Raiden Project", "file": "games/trp.zip", "thumb": "sampul/trp.jpg", "type": "psx" }
+  { "id": "psx_trp", "title": "The Raiden Project", "file": "games/trp.zip", "thumb": "sampul/trp.jpg", "type": "psx" },
+  { "id": "gbc_mgs", "title": "Metal Gear Solid", "file": "games/mgs.gbc", "thumb": "sampul/mgs.jpg", "type": "gb" }
+
 ]
