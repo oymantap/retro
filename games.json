@@ -1,5 +1,6 @@
 [
   { "id": "gba3", "title": "Super Mario Bros", "file": "games/smb.gba", "thumb": "sampul/smb.jpg", "type": "gba" },
+  { "id": "nes_smb16", "title": "Super Mario Bros 16", "file": "games/smb16.gba", "thumb": "sampul/smb.jpg", "type": "nes" },
   { "id": "gb", "title": "Casper", "file": "games/c.gb", "thumb": "https://placehold.co/100x100/1e293b/fff?text=Casper", "type": "gb" },
   { "id": "gba1", "title": "Tetris Advance", "file": "games/tt.gba", "thumb": "https://placehold.co/100x100/1e293b/fff?text=Tetris", "type": "gba" },
   { "id": "gba2", "title": "Pokemon My Ass", "file": "games/pma.gba", "thumb": "sampul/pma.jpg", "type": "gba" },
@@ -13,5 +14,8 @@
   { "id": "gbc_bm_max", "title": "Bomberman Max - Red Challenger", "file": "games/bm_max.gbc", "thumb": "sampul/bm_max.jpg", "type": "gb" },
   { "id": "psx_trp", "title": "The Raiden Project", "file": "games/trp.zip", "thumb": "sampul/trp.jpg", "type": "psx" },
   { "id": "gbc_mgs", "title": "Metal Gear Solid", "file": "games/mgs.gbc", "thumb": "sampul/mgs.jpg", "type": "gb" },
-  { "id": "gba_fifas2005", "title": "FIFA Soccer 2005", "file": "games/fifas2005.gba", "thumb": "sampul/fifas2005.jpg", "type": "gba" }
+  { "id": "gba_fifas2005", "title": "FIFA Soccer 2005", "file": "games/fifas2005.gba", "thumb": "sampul/fifas2005.jpg", "type": "gba" },
+  { "id": "gba_ashgray", "title": "Pokemon AshGray", "file": "games/ashgray.gba", "thumb": "ashgray.jpg", "type": "gba" },
+  { "id": "gba_dbaa", "title": "Dragon Ball - Advanced Adventure", "file": "games/dbaa.gba", "thumb": "dbaa.jpg", "type": "gba" },
+  { "id": "gba_msa", "title": "Metal Slug Advance", "file": "games/msa.gba", "thumb": "sampul/msa.jpg", "type": "gba" }
 ]
