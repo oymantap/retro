@@ -17,5 +17,6 @@
   { "id": "gba_fifas2005", "title": "FIFA Soccer 2005", "file": "games/fifas2005.gba", "thumb": "sampul/fifas2005.jpg", "type": "gba" },
   { "id": "gba_ashgray", "title": "Pokemon AshGray", "file": "games/ashgray.gba", "thumb": "ashgray.jpg", "type": "gba" },
   { "id": "gba_dbaa", "title": "Dragon Ball - Advanced Adventure", "file": "games/dbaa.gba", "thumb": "dbaa.jpg", "type": "gba" },
-  { "id": "gba_msa", "title": "Metal Slug Advance", "file": "games/msa.gba", "thumb": "sampul/msa.jpg", "type": "gba" }
+  { "id": "gba_msa", "title": "Metal Slug Advance", "file": "games/msa.gba", "thumb": "sampul/msa.jpg", "type": "gba" },
+  { "id": "nes_tetris", "title": "Tetris 1989", "file": "games/tetris.nes", "thumb": "sampul/tetris.jpg", "type": "nes" }
 ]

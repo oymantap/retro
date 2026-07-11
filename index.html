@@ -12,6 +12,8 @@
             -webkit-user-select: none;
             margin: 0;
             padding: 0;
+            /* Mencegah pointer-events nyangkut di icon saat di-touch */
+            pointer-events: auto;
         }
 
         body {
@@ -122,7 +124,6 @@
             to { opacity: 0; visibility: hidden; }
         }
 
-        /* Menyembunyikan UI bawaan internal EmulatorJS */
         div[id*="virtual-gamepad"], .ejs-controls, #game img, .pico8-content, [class*="gamepad"], #virtual-gamepad {
             display: none !important;
             opacity: 0 !important;
@@ -135,6 +136,7 @@
             flex-direction: column;
             gap: 10px;
             z-index: 999;
+            touch-action: none; /* Mencegah browser melakukan scroll/zoom otomatis saat main */
         }
 
         .lr-container {
@@ -160,6 +162,11 @@
         }
         .btn-lr.active { background: rgba(255, 255, 255, 0.2); color: #fff; }
 
+        /* Proteksi total agar icon internal tidak merusak elementFromPoint */
+        .dpad-btn i, .btn-ps i, .btn-lr i, .btn-menu i {
+            pointer-events: none !important;
+        }
+
         .main-controls {
             display: flex;
             justify-content: space-between;
@@ -167,17 +174,15 @@
             padding: 5px 0;
         }
 
-        /* Kontainer D-Pad dibikin jadi Grid 3 Kolom x 3 Baris */
         .dpad {
             position: relative;
-            width: 138px; /* Diubah dikit biar pas kelipatan 46px */
+            width: 138px; 
             height: 138px;
             display: grid;
             grid-template-columns: repeat(3, 46px);
             grid-template-rows: repeat(3, 46px);
         }
 
-        /* Bersihkan properti top/left lama karena kita pakai grid */
         .dpad-btn, .dpad-center {
             width: 46px;
             height: 46px;
@@ -192,15 +197,12 @@
 
         .dpad-btn.active { background: rgba(255, 255, 255, 0.2); }
 
-        /* Taruh tiap tombol di koordinat grid yang pas */
         .dpad-up    { grid-column: 2; grid-row: 1; border-radius: 6px 6px 0 0; border-bottom: none; }
         .dpad-left  { grid-column: 1; grid-row: 2; border-radius: 6px 0 0 6px; border-right: none; }
         .dpad-center{ grid-column: 2; grid-row: 2; background: rgba(255, 255, 255, 0.02); border: none; }
         .dpad-right { grid-column: 3; grid-row: 2; border-radius: 0 6px 6px 0; border-left: none; }
         .dpad-down  { grid-column: 2; grid-row: 3; border-radius: 0 0 6px 6px; border-top: none; }
 
-
-        /* Desain Tata Letak Tombol Aksi (Diamond Pattern) */
         .action-buttons-ps {
             position: relative;
             width: 140px;
@@ -266,7 +268,6 @@
             font-weight: bold;
         }
 
-        /* Modal Pop-up */
         .custom-popup {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -368,9 +369,7 @@
                 </div>
             </div>
 
-
             <div class="main-controls">
-                <!-- D-PAD AREA DENGAN ICON KEREN -->
                 <div class="dpad" id="dpadRegion">
                     <div class="dpad-btn dpad-up" data-key="ArrowUp"><i class="fas fa-chevron-up"></i></div>
                     <div class="dpad-btn dpad-down" data-key="ArrowDown"><i class="fas fa-chevron-down"></i></div>
@@ -379,7 +378,6 @@
                     <div class="dpad-center" id="dpadCenterIcon"><i class="fas fa-circle" style="font-size: 0.5rem; opacity: 0.3;"></i></div>
                 </div>
 
-                <!-- ACTION BUTTONS DENGAN ICON -->
                 <div class="action-buttons-ps" id="actionRegion">
                     <div class="btn-ps btn-triangle" data-key="triangle"><i class="fas fa-caret-up"></i></div>
                     <div class="btn-ps btn-square" data-key="square"><i class="fas fa-square" style="font-size: 0.8rem;"></i></div>
@@ -425,7 +423,6 @@
         let currentGame = null;
         let currentlyPressedKeys = new Set();
 
-        // 1. Membaca daftar game dan inisialisasi awal
         async function initEmulator() {
             try {
                 const response = await fetch('./games.json');
@@ -447,7 +444,6 @@
             }
         }
 
-        // 2. Booting Core & Konfigurasi Utama EmulatorJS
         function bootEmulatorJS(fileUrl, coreType, title) {
             window.EJS_player = '#game';
             window.EJS_core = coreType; 
@@ -455,17 +451,20 @@
             window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
             
             window.EJS_VirtualGamepadSettings = { extThemes: [] };
+            
+            // OPTIMALISASI EMULATOR & PENURUNAN BEBAN CHEAT
             window.EJS_Settings = {
                 showMenu: false,
                 startOnLoaded: true,
                 buttons: false, 
                 disableMenu: true,
                 FastForward: true, 
-                ForceWebAudio: true, 
-                WebGl: true 
+                ForceWebAudio: false, // Diganti ke false untuk hemat CPU di Mobile Device
+                WebGl: true,
+                WebGL2: true,         // Aktifkan WebGL2 agar load buffer memori cheat didelegasikan ke GPU
+                ThreadedRendering: true // Render multi-thread biar kencang
             };
 
-            // Mapping KeyboardEvent asli untuk dibaca Core RetroArch EmulatorJS
             window.EJS_buttons = {
                 allow_up: 'ArrowUp', allow_down: 'ArrowDown', allow_left: 'ArrowLeft', allow_right: 'ArrowRight',
                 allow_a: 'z', allow_b: 'x', allow_x: 's', allow_y: 'a',
@@ -479,7 +478,7 @@
             document.head.appendChild(loaderScript);
         }
 
-        function renderGameList() {
+       function renderGameList() {
             const container = document.getElementById('gameListContainer');
             container.innerHTML = ''; 
             gamesData.forEach(game => {
@@ -495,7 +494,6 @@
             });
         }
 
-        // Menangani file ROM lokal yang diupload mandiri
         document.getElementById('localRomInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -511,7 +509,6 @@
             if(overlay) overlay.style.display = 'none';
         });
 
-        // Pengaturan Antarmuka Modal Pop-up (Pilih Game & Speed)
         const gamePopup = document.getElementById('gamePopup');
         const speedPopup = document.getElementById('speedPopup');
         document.getElementById('openSpeedBtn').onclick = () => speedPopup.classList.add('active');
@@ -529,7 +526,6 @@
             if (window.EJS_emulator && typeof window.EJS_emulator.speed === 'function') window.EJS_emulator.speed(val);
         };
 
-        // 3. Sistem Pengiriman Event Keyboard Virtual ke Engine Core
         function sendCoreKey(type, btnType) {
             let keyCodeMap = {
                 'ArrowUp': 38, 'ArrowDown': 40, 'ArrowLeft': 37, 'ArrowRight': 39,
@@ -556,14 +552,11 @@
                 view: window
             };
 
+            window.dispatchEvent(new KeyboardEvent(type, eventInit));
             document.dispatchEvent(new KeyboardEvent(type, eventInit));
-            const gameContainer = document.getElementById('game');
-            if(gameContainer) {
-                gameContainer.dispatchEvent(new KeyboardEvent(type, eventInit));
-            }
         }
 
-        // 4. Multi-Touch Engine (Membaca koordinat sentuhan jari di layar HP)
+        // PERBAIKAN UTAMA ENGINE TOUCH (Anti Ghost-Touch & Respon Cepat)
         function processTouchFrame(e) {
             e.preventDefault();
             let activeThisFrame = new Set();
@@ -572,14 +565,21 @@
                 let t = e.touches[i];
                 let targetEl = document.elementFromPoint(t.clientX, t.clientY);
 
-                if (targetEl && (targetEl.classList.contains('dpad-btn') || targetEl.classList.contains('btn-ps') || targetEl.classList.contains('btn-lr') || targetEl.classList.contains('btn-menu'))) {
-                    let key = targetEl.getAttribute('data-key') || targetEl.getAttribute('data-label');
-                    if (key) {
-                        activeThisFrame.add(key);
-                        if (!currentlyPressedKeys.has(key)) {
-                            currentlyPressedKeys.add(key);
-                            targetEl.classList.add('active');
-                            sendCoreKey('keydown', key);
+                if (targetEl) {
+                    // Jika deteksi menyentuh icon (i), naikkan target ke parent-nya (div tombol)
+                    if (targetEl.tagName === 'I') {
+                        targetEl = targetEl.parentElement;
+                    }
+
+                    if (targetEl.classList.contains('dpad-btn') || targetEl.classList.contains('btn-ps') || targetEl.classList.contains('btn-lr') || targetEl.classList.contains('btn-menu')) {
+                        let key = targetEl.getAttribute('data-key') || targetEl.getAttribute('data-label');
+                        if (key) {
+                            activeThisFrame.add(key);
+                            if (!currentlyPressedKeys.has(key)) {
+                                currentlyPressedKeys.add(key);
+                                targetEl.classList.add('active');
+                                sendCoreKey('keydown', key);
+                            }
                         }
                     }
                 }
