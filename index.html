@@ -12,8 +12,6 @@
             -webkit-user-select: none;
             margin: 0;
             padding: 0;
-            /* Mencegah pointer-events nyangkut di icon saat di-touch */
-            pointer-events: auto;
         }
 
         body {
@@ -136,7 +134,7 @@
             flex-direction: column;
             gap: 10px;
             z-index: 999;
-            touch-action: none; /* Mencegah browser melakukan scroll/zoom otomatis saat main */
+            touch-action: none;
         }
 
         .lr-container {
@@ -162,7 +160,7 @@
         }
         .btn-lr.active { background: rgba(255, 255, 255, 0.2); color: #fff; }
 
-        /* Proteksi total agar icon internal tidak merusak elementFromPoint */
+        /* Mencegah icon merusak event pembacaan touch */
         .dpad-btn i, .btn-ps i, .btn-lr i, .btn-menu i {
             pointer-events: none !important;
         }
@@ -452,17 +450,16 @@
             
             window.EJS_VirtualGamepadSettings = { extThemes: [] };
             
-            // OPTIMALISASI EMULATOR & PENURUNAN BEBAN CHEAT
             window.EJS_Settings = {
                 showMenu: false,
                 startOnLoaded: true,
                 buttons: false, 
                 disableMenu: true,
                 FastForward: true, 
-                ForceWebAudio: false, // Diganti ke false untuk hemat CPU di Mobile Device
+                ForceWebAudio: false, 
                 WebGl: true,
-                WebGL2: true,         // Aktifkan WebGL2 agar load buffer memori cheat didelegasikan ke GPU
-                ThreadedRendering: true // Render multi-thread biar kencang
+                WebGL2: true,         
+                ThreadedRendering: true 
             };
 
             window.EJS_buttons = {
@@ -478,7 +475,7 @@
             document.head.appendChild(loaderScript);
         }
 
-       function renderGameList() {
+         function renderGameList() {
             const container = document.getElementById('gameListContainer');
             container.innerHTML = ''; 
             gamesData.forEach(game => {
@@ -526,6 +523,7 @@
             if (window.EJS_emulator && typeof window.EJS_emulator.speed === 'function') window.EJS_emulator.speed(val);
         };
 
+        // KOREKSI AMAN: Jalur pengiriman event dibatasi agar tidak memicu shortcut browser (F5/Refresh)
         function sendCoreKey(type, btnType) {
             let keyCodeMap = {
                 'ArrowUp': 38, 'ArrowDown': 40, 'ArrowLeft': 37, 'ArrowRight': 39,
@@ -552,11 +550,16 @@
                 view: window
             };
 
-            window.dispatchEvent(new KeyboardEvent(type, eventInit));
-            document.dispatchEvent(new KeyboardEvent(type, eventInit));
+            const kEvent = new KeyboardEvent(type, eventInit);
+            
+            // Kirim event HANYA ke area element game, jangan ke window global biar ga memicu refresh browser
+            const gameContainer = document.getElementById('game');
+            if (gameContainer) {
+                gameContainer.dispatchEvent(kEvent);
+            }
+            document.dispatchEvent(kEvent);
         }
 
-        // PERBAIKAN UTAMA ENGINE TOUCH (Anti Ghost-Touch & Respon Cepat)
         function processTouchFrame(e) {
             e.preventDefault();
             let activeThisFrame = new Set();
@@ -566,7 +569,6 @@
                 let targetEl = document.elementFromPoint(t.clientX, t.clientY);
 
                 if (targetEl) {
-                    // Jika deteksi menyentuh icon (i), naikkan target ke parent-nya (div tombol)
                     if (targetEl.tagName === 'I') {
                         targetEl = targetEl.parentElement;
                     }
